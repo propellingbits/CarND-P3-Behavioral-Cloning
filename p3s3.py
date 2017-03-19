@@ -52,7 +52,7 @@ def blur(img, kernel_size):
     return cv2.blur(img, (kernel_size, kernel_size))
 
 def cropImage(img):
-    return image[15:40, 0:80] #height, width, color channels
+    return img[15:40, 0:80] #height, width, color channels
 
 def resizeImage(img):
     #cv2.resize(img, (cols (width), rows (height)))
@@ -88,12 +88,15 @@ def preprocessImage(img):
     #img = normalize(blur(hsv(img)[:,:,1], kernel_size=5))
     #img = blur(hsv(img)[:,:,1], kernel_size=5)
     ##img = blur(img, kernel_size=5)
-    croppedImage = cropImage(img)
-    resizedImage = resizeImage(croppedImage)
+    resizedImage = resizeImage(img)
+    croppedImage = cropImage(resizedImage)
+    hsved = hsv(croppedImage)[:,:,1]
+    blurredImage = blur(hsved, kernel_size=5)
+    
     #rgb2yuved = rgb2yuv(resizedImage)
     #hsved = hsv(resizedImage)
     #blurred = blur(hsved, 5)
-    normalizedImage = normalize(resizedImage)
+    normalizedImage = normalize(blurredImage)
     processedImg = normalizedImage
     return processedImg
 

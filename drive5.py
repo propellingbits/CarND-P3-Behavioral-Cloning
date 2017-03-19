@@ -39,7 +39,7 @@ def blur(img, kernel_size):
     return cv2.blur(img, (kernel_size, kernel_size))
 
 def cropImage(img):
-    return image[15:40, 0:80] #height, width, color channels
+    return img[15:40, 0:80] #height, width, color channels
 
 def resizeImage(img):
     #cv2.resize(img, (cols (width), rows (height)))
@@ -62,10 +62,12 @@ def hsv(image):
     return image
 
 def preprocessImage(img):
-    croppedImage = cropImage(img)
-    resizedImage = resizeImage(croppedImage)
-    normalizedImage = normalize(resizedImage)
-    processedImg = normalizedImage    
+    resizedImage = resizeImage(img)
+    croppedImage = cropImage(resizedImage)
+    hsved = hsv(croppedImage)[:,:,1]
+    blurredImage = blur(hsved, kernel_size=5)    
+    normalizedImage = normalize(blurredImage)
+    processedImg = normalizedImage
     return processedImg
 
 
@@ -113,11 +115,10 @@ def telemetry(sid, data):
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
-
     
     image_array = preprocessImage(image_array)
 
-    steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+    steering_angle = float(model.predict(image_array[None, :, :], batch_size=1))
 
     throttle = controller.update(float(speed))
 
